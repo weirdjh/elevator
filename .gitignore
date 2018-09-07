@@ -1,3 +1,5 @@
 elevatorContainer/makefile_env
 elevatorContainer/vendor
+elevatorContainer/elevatorContainer
 elevatorSim/vendor
+elevatorSim/elevatorSim

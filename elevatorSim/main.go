@@ -1,10 +1,14 @@
 package main
 
 import (
+	docker "elevatorSim/dockerRun"
 	util "elevatorSim/elevator"
 )
 
 func main() {
+	dockerrun := docker.NewDockerRun()
+	dockerrun.EnsureImageExists()
+
 	elevMngr := util.NewElevatorMngr()
 
 	elevMngr.GetElevatorsStatus()

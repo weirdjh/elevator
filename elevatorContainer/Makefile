@@ -1,7 +1,7 @@
 include makefile_env
 
 USERID ?= heojh93
-IMAGE ?= elavator
+IMAGE ?= elevator
 VERSION ?= 0.1
 
 

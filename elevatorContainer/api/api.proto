@@ -1,0 +1,47 @@
+//https://medium.com/pantomath/how-we-use-grpc-to-build-a-client-server-system-in-go-dd20045fa1c2
+
+syntax = "proto3";
+
+package api;
+
+message PingMessage {
+  string greeting = 1;
+}
+
+service Ping {
+  rpc SayHello (PingMessage) returns (PingMessage) {}
+}
+
+service ElevatorService {
+  rpc GetElevatorStatus (getElevatorStatusRequest) returns (getElevatorStatusResponse) {}
+  rpc ElevatorUp (elevatorUpRequest) returns (elevatorUpResponse) {}
+  rpc ElevatorDown (elevatorDownRequest) returns (elevatorDownResponse) {}
+  rpc ElevatorStop (elevatorStopRequest) returns (elevatorStopResponse) {}
+}
+
+message getElevatorStatusRequest {}
+message getElevatorStatusResponse {
+  string name = 1;
+  string direction = 2;
+  int32 floor = 3;
+}
+
+message elevatorUpRequest {
+  int32 destination = 1;
+}
+message elevatorUpResponse {}
+
+message elevatorDownRequest {
+  int32 destination = 1;
+}
+message elevatorDownResponse {}
+
+message elevatorStopRequest {}
+message elevatorStopResponse {}
+
+/*
+protoc -I api/ \
+    -I . \
+    --go_out=plugins=grpc:api \
+    api/api.proto
+*/

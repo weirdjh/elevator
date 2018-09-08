@@ -10,7 +10,7 @@ VERSION ?= 0.1
 all: go_build image_build image_push
 
 go_build:
-	go build
+	GOOS=linux GOARCH=amd64 go build
 
 image_build: Dockerfile
 	docker build -t $(USERID)/$(IMAGE):$(VERSION) -f Dockerfile .

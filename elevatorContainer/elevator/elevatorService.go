@@ -14,7 +14,7 @@ const (
 	Move ElevatorState = "MOVE"
 )
 
-type Elevator struct {
+type ElevatorService struct {
 	name string
 	//people    []Person
 	state     ElevatorState
@@ -25,8 +25,8 @@ type Elevator struct {
 	//spec      map[string]string
 }
 
-func NewElevator(name string) *Elevator {
-	return &Elevator{
+func NewElevatorService(name string) *ElevatorService {
+	return &ElevatorService{
 		name:      name,
 		state:     Idle,
 		direction: "",
@@ -34,7 +34,7 @@ func NewElevator(name string) *Elevator {
 	}
 }
 
-func (e *Elevator) GetElevatorStatus(cxt context.Context, req *api.GetElevatorStatusRequest) (*api.GetElevatorStatusResponse, error) {
+func (e *ElevatorService) GetElevatorStatus(cxt context.Context, req *api.GetElevatorStatusRequest) (*api.GetElevatorStatusResponse, error) {
 	resp := &api.GetElevatorStatusResponse{
 		Name:      e.name,
 		Direction: e.direction,
@@ -43,7 +43,7 @@ func (e *Elevator) GetElevatorStatus(cxt context.Context, req *api.GetElevatorSt
 	return resp, nil
 }
 
-func (e *Elevator) ElevatorUp(cxt context.Context, req *api.ElevatorUpRequest) (*api.ElevatorUpResponse, error) {
+func (e *ElevatorService) ElevatorUp(cxt context.Context, req *api.ElevatorUpRequest) (*api.ElevatorUpResponse, error) {
 	e.state = Move
 	resp := &api.ElevatorUpResponse{}
 
@@ -54,7 +54,7 @@ func (e *Elevator) ElevatorUp(cxt context.Context, req *api.ElevatorUpRequest) (
 	return resp, nil
 }
 
-func (e *Elevator) ElevatorDown(cxt context.Context, req *api.ElevatorDownRequest) (*api.ElevatorDownResponse, error) {
+func (e *ElevatorService) ElevatorDown(cxt context.Context, req *api.ElevatorDownRequest) (*api.ElevatorDownResponse, error) {
 	e.state = Move
 	resp := &api.ElevatorDownResponse{}
 
@@ -65,7 +65,7 @@ func (e *Elevator) ElevatorDown(cxt context.Context, req *api.ElevatorDownReques
 	return resp, nil
 }
 
-func (e *Elevator) ElevatorStop(cxt context.Context, req *api.ElevatorStopRequest) (*api.ElevatorStopResponse, error) {
+func (e *ElevatorService) ElevatorStop(cxt context.Context, req *api.ElevatorStopRequest) (*api.ElevatorStopResponse, error) {
 	e.state = Stop
 	resp := &api.ElevatorStopResponse{}
 

@@ -1,6 +1,4 @@
 FROM scratch
 
-ADD ./elevatorContainer /
+ADD elevatorContainer elevatorContainer
 CMD ["./elevatorContainer"]
-
-EXPOSE 7777

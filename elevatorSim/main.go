@@ -2,16 +2,27 @@ package main
 
 import (
 	docker "elevatorSim/dockerRun"
-	util "elevatorSim/elevator"
+	mng "elevatorSim/elevator"
+	"fmt"
+	"time"
+)
+
+const (
+	nr_elevator = 2
 )
 
 func main() {
 	dockerrun := docker.NewDockerRun()
 	dockerrun.EnsureImageExists()
 
-	elevMngr := util.NewElevatorMngr()
+	elevMngr := mng.NewElevatorMngr(nr_elevator)
+	if err := elevMngr.AddElevators(); err != nil {
+		fmt.Printf("%v", err)
+	}
+	defer elevMngr.DeleteElevators()
 
-	elevMngr.GetElevatorsStatus()
+	time.Sleep(time.Second * 100)
+
 	/*
 		elevMngr.AddElevator("first")
 		elevMngr.AddElevator("second")

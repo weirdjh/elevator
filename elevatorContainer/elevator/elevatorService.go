@@ -3,6 +3,7 @@ package elevator
 import (
 	"context"
 	"elevatorContainer/api"
+	"fmt"
 	"time"
 )
 
@@ -50,6 +51,7 @@ func (e *ElevatorService) ElevatorUp(cxt context.Context, req *api.ElevatorUpReq
 	for e.floor < req.GetDestination() {
 		time.Sleep(time.Second * 1)
 		e.floor += 1
+		fmt.Printf("Currnet floor : %d\n", e.floor)
 	}
 	return resp, nil
 }
@@ -61,6 +63,7 @@ func (e *ElevatorService) ElevatorDown(cxt context.Context, req *api.ElevatorDow
 	for e.floor < req.GetDestination() {
 		time.Sleep(time.Second * 1)
 		e.floor -= 1
+		fmt.Printf("Currnet floor : %d\n", e.floor)
 	}
 	return resp, nil
 }

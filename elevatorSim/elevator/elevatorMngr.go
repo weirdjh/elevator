@@ -1,15 +1,11 @@
 package elevator
 
 import (
-	"context"
 	"fmt"
-	"log"
 
-	"elevatorSim/api"
 	docker "elevatorSim/dockerRun"
 
 	"github.com/golang/glog"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -21,27 +17,31 @@ var (
 )
 
 type ElevatorMngr struct {
-	nr_elevator        int
+	nrElevator         int
 	dockerRun          *docker.DockerRun
 	elevatorContainers map[string]*ElevatorContainer
 	//eventChan EventWatch
 }
 
-func NewElevatorMngr(nr_elevator int) *ElevatorMngr {
+func NewElevatorMngr(nrElevator int) *ElevatorMngr {
 	dockerRun := docker.NewDockerRun()
 	dockerRun.EnsureImageExists()
 
 	return &ElevatorMngr{
-		nr_elevator:        nr_elevator,
+		nrElevator:         nrElevator,
 		dockerRun:          dockerRun,
 		elevatorContainers: make(map[string]*ElevatorContainer),
 		//eventChan: NewEventWatch(),
 	}
 }
 
+func (em *ElevatorMngr) GetElevator(name string) *ElevatorContainer {
+	return em.elevatorContainers[name]
+}
+
 func (em *ElevatorMngr) AddElevators() error {
 
-	for i := 0; i < em.nr_elevator; i++ {
+	for i := 0; i < em.nrElevator; i++ {
 		name := fmt.Sprintf("%d%sElevator", i+1, ORDINAL_EXP[map[bool]int{true: 2, false: i}[i > 2]])
 		port := fmt.Sprintf("%d", STARTING_PORT+i)
 
@@ -72,8 +72,8 @@ func (em *ElevatorMngr) AddElevator(name string, port string) error {
 }
 
 func (em *ElevatorMngr) DeleteElevators() {
-	for i := 0; i < em.nr_elevator; i++ {
-		name := fmt.Sprintf("%d%sElevator", i, ORDINAL_EXP[map[bool]int{true: 2, false: i}[i > 2]])
+	for i := 0; i < em.nrElevator; i++ {
+		name := fmt.Sprintf("%d%sElevator", i+1, ORDINAL_EXP[map[bool]int{true: 2, false: i}[i > 2]])
 
 		if err := em.DeleteElevator(em.elevatorContainers[name]); err != nil {
 			glog.Fatalf("Error while delete container %s: %v", name, err)
@@ -89,6 +89,24 @@ func (em *ElevatorMngr) DeleteElevator(elevator *ElevatorContainer) error {
 		return err
 	}
 	if err := elevator.RemoveConnection(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (em *ElevatorMngr) MngElevatorUp(name string, dst int32) error {
+	elevator := em.elevatorContainers[name]
+	_, err := elevator.ElevatorUp(dst)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (em *ElevatorMngr) MngElevatorDown(name string, dst int32) error {
+	elevator := em.elevatorContainers[name]
+	_, err := elevator.ElevatorDown(dst)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -149,28 +167,6 @@ func (em *ElevatorMngr) PingElevator() {
 	log.Printf("Response from server: %s", response.Greeting)
 }
 */
-
-// TODO:
-// 1. get Elevator IP using elevator container name
-// 2. dial server with IP:PORT
-// 3. add tls connection
-func (em *ElevatorMngr) GetElevatorsStatus() {
-	var conn *grpc.ClientConn
-	conn, err := grpc.Dial("127.0.0.1:7777", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %s", err)
-	}
-	defer conn.Close()
-
-	// elevator name, service client
-	c := api.NewElevatorServiceClient(conn)
-
-	response, err := c.GetElevatorStatus(context.Background(), &api.GetElevatorStatusRequest{})
-	if err != nil {
-		log.Fatalf("Error while get status: %s", err)
-	}
-	log.Println(response)
-}
 
 /*
 func (em *ElevatorMngr) PrintElevator() {

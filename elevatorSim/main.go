@@ -3,6 +3,7 @@ package main
 import (
 	docker "elevatorSim/dockerRun"
 	mng "elevatorSim/elevator"
+	"elevatorSim/traffic"
 	"fmt"
 	"time"
 )
@@ -12,6 +13,10 @@ const (
 )
 
 func main() {
+
+	t := traffic.ElevatorTraffic()
+	fmt.Println(t[0])
+
 	dockerrun := docker.NewDockerRun()
 	dockerrun.EnsureImageExists()
 
@@ -20,8 +25,6 @@ func main() {
 		fmt.Printf("%v", err)
 	}
 	defer elevMngr.DeleteElevators()
-
-	time.Sleep(time.Second * 20)
 
 	// docker attach 1stElevator
 	elevator1 := elevMngr.GetElevator("1stElevator")

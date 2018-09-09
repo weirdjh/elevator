@@ -22,22 +22,28 @@ service ElevatorService {
 message getElevatorStatusRequest {}
 message getElevatorStatusResponse {
   string name = 1;
-  string direction = 2;
+  string state = 2;
   int32 floor = 3;
 }
 
 message elevatorUpRequest {
   int32 destination = 1;
 }
-message elevatorUpResponse {}
+message elevatorUpResponse {
+  bool done = 1;
+}
 
 message elevatorDownRequest {
   int32 destination = 1;
 }
-message elevatorDownResponse {}
+message elevatorDownResponse {
+  bool done = 1;
+}
 
 message elevatorStopRequest {}
-message elevatorStopResponse {}
+message elevatorStopResponse {
+  bool done = 1;
+}
 
 /*
 protoc -I api/ \

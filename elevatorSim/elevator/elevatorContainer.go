@@ -10,9 +10,9 @@ import (
 )
 
 type ElevatorStatus struct {
-	name      string
-	direction string
-	floor     int32
+	name  string
+	state string
+	floor int32
 }
 
 type ElevatorContainer struct {
@@ -50,9 +50,9 @@ func (e *ElevatorContainer) GetElevatorStatus() (*ElevatorStatus, error) {
 		return nil, fmt.Errorf("Error while get status: %s", err)
 	}
 	status := &ElevatorStatus{
-		name:      response.Name,
-		direction: response.Direction,
-		floor:     response.Floor,
+		name:  response.Name,
+		state: response.State,
+		floor: response.Floor,
 	}
 	return status, nil
 }
@@ -62,6 +62,11 @@ func (e *ElevatorContainer) ElevatorUp(dest int32) (*api.ElevatorUpResponse, err
 	if err != nil {
 		return nil, fmt.Errorf("Error while elevator up: %s", err)
 	}
+
+	if response.Done {
+		fmt.Println("Elevator Up Done")
+	}
+
 	return response, nil
 }
 
@@ -69,6 +74,10 @@ func (e *ElevatorContainer) ElevatorDown(dest int32) (*api.ElevatorDownResponse,
 	response, err := e.serviceCli.ElevatorDown(context.Background(), &api.ElevatorDownRequest{Destination: dest})
 	if err != nil {
 		return nil, fmt.Errorf("Error while elevator up: %s", err)
+	}
+
+	if response.Done {
+		fmt.Println("Elevator Down Done")
 	}
 	return response, nil
 }

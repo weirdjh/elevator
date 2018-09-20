@@ -10,17 +10,17 @@ import (
 )
 
 type ElevatorStatus struct {
-	name  string
-	state string
-	floor int32
+	Name  string
+	State string
+	Floor int32
 }
 
 type ElevatorContainer struct {
-	id         string
-	name       string
-	conn       *grpc.ClientConn
-	serviceCli api.ElevatorServiceClient
-	port       string
+	Id         string
+	Name       string
+	Conn       *grpc.ClientConn
+	ServiceCli api.ElevatorServiceClient
+	Port       string
 }
 
 func NewElevatorContainer(name string, port string, containerID string) *ElevatorContainer {
@@ -32,52 +32,52 @@ func NewElevatorContainer(name string, port string, containerID string) *Elevato
 
 	sc := api.NewElevatorServiceClient(conn)
 	return &ElevatorContainer{
-		id:         containerID,
-		name:       name,
-		conn:       conn,
-		serviceCli: sc,
-		port:       port,
+		Id:         containerID,
+		Name:       name,
+		Conn:       conn,
+		ServiceCli: sc,
+		Port:       port,
 	}
 }
 
 func (e *ElevatorContainer) RemoveConnection() error {
-	return e.conn.Close()
+	return e.Conn.Close()
 }
 
 func (e *ElevatorContainer) GetElevatorStatus() (*ElevatorStatus, error) {
-	response, err := e.serviceCli.GetElevatorStatus(context.Background(), &api.GetElevatorStatusRequest{})
+	response, err := e.ServiceCli.GetElevatorStatus(context.Background(), &api.GetElevatorStatusRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("Error while get status: %s", err)
 	}
 	status := &ElevatorStatus{
-		name:  response.Name,
-		state: response.State,
-		floor: response.Floor,
+		Name:  response.Name,
+		State: response.State,
+		Floor: response.Floor,
 	}
 	return status, nil
 }
 
 func (e *ElevatorContainer) ElevatorUp(dest int32) (*api.ElevatorUpResponse, error) {
-	response, err := e.serviceCli.ElevatorUp(context.Background(), &api.ElevatorUpRequest{Destination: dest})
+	response, err := e.ServiceCli.ElevatorUp(context.Background(), &api.ElevatorUpRequest{Destination: dest})
 	if err != nil {
 		return nil, fmt.Errorf("Error while elevator up: %s", err)
 	}
 
 	if response.Done {
-		fmt.Println("Elevator Up Done")
+		fmt.Printf("%s -> Up Done : ", e.Name)
 	}
 
 	return response, nil
 }
 
 func (e *ElevatorContainer) ElevatorDown(dest int32) (*api.ElevatorDownResponse, error) {
-	response, err := e.serviceCli.ElevatorDown(context.Background(), &api.ElevatorDownRequest{Destination: dest})
+	response, err := e.ServiceCli.ElevatorDown(context.Background(), &api.ElevatorDownRequest{Destination: dest})
 	if err != nil {
 		return nil, fmt.Errorf("Error while elevator up: %s", err)
 	}
 
 	if response.Done {
-		fmt.Println("Elevator Down Done")
+		fmt.Printf("%s -> Down Done : ", e.Name)
 	}
 	return response, nil
 }

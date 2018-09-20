@@ -26,10 +26,15 @@ type Move struct {
 	From int    `json:"from"`
 	To   int    `json:"to"`
 }
+type MoveTimeFormat struct {
+	At   time.Time
+	From int32
+	To   int32
+}
 
 type MoveEvent struct {
 	UserInfo UserInfo
-	Move     Move
+	Move     MoveTimeFormat
 }
 
 func ReadTrafficFile() Users {
@@ -46,6 +51,7 @@ func ReadTrafficFile() Users {
 	return users
 }
 
+// TODO: Parsing and Covert Move.at into Time format
 func ElevatorTraffic() []*MoveEvent {
 
 	users := ReadTrafficFile()
@@ -54,19 +60,25 @@ func ElevatorTraffic() []*MoveEvent {
 	for _, u := range users.User {
 		userInfo := u.UserInfo
 		for _, m := range u.Move {
+
+			layout := "2006-01-02T15:04:05.00"
+			AtTimeFormat, _ := time.Parse(layout, "2018-01-01T"+m.At)
+
 			me = append(me, &MoveEvent{
 				UserInfo: userInfo,
-				Move:     m,
+				Move: MoveTimeFormat{
+					At:   AtTimeFormat,
+					From: int32(m.From),
+					To:   int32(m.To),
+				},
 			})
 		}
 	}
 
 	// Sort with time
 	sort.SliceStable(me, func(i, j int) bool {
-		layout := "15:04:05.00"
-		t1, _ := time.Parse(layout, me[i].Move.At)
-		t2, _ := time.Parse(layout, me[j].Move.At)
-
+		t1 := me[i].Move.At
+		t2 := me[j].Move.At
 		return t1.Before(t2)
 	})
 

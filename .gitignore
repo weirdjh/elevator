@@ -1,5 +1,15 @@
-elevatorContainer/makefile_env
-elevatorContainer/vendor
-elevatorContainer/elevatorContainer
+# vendor
 elevatorSim/vendor
+elevatorContainer/vendor
+
+# private file
+elevatorContainer/makefile_env
+
+# output
+elevatorContainer/elevatorContainer
 elevatorSim/elevatorSim
+elevatorSim/bind_darwin_amd64.go
+elevatorSim/output/
+
+# create file in MAC
+.DS_Store

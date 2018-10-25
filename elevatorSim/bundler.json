@@ -1,0 +1,6 @@
+{
+    "app_name": "Elevator",
+    "icon_path_darwin": "resources/icon/icon.icns",
+    "icon_path_linux": "resources/icon/icon.png",
+    "icon_path_windows": "resources/icon/icon.ico"
+  }

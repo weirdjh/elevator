@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/css/base.css"/>
+    <link rel="stylesheet" href="static/lib/astiloader/astiloader.css">
+    <link rel="stylesheet" href="static/lib/astimodaler/astimodaler.css">
+    <link rel="stylesheet" href="static/lib/astinotifier/astinotifier.css">
+    <link rel="stylesheet" href="static/lib/font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="left">
+        <div class="elev_logo">Elevator Elegator</div>
+        <div class="elev_menu">
+            <div class="elev_info">
+                <div>환경설정</div>
+                <div class="elev_env_input">
+                    <div>건물 최고층 : <input type="text" id="building_max"></div>
+                    <div>엘리베이터 수 : <input type="text" id="elevator_nr"></div>
+                    <button onclick="env_input()">입력</button>
+                </div>
+            </div>
+            <div class="elev_person">
+                <span>트래픽발생</span>
+                <div class="person_wrapper">
+                    <div>임의 트래픽 발생</div>
+                    <div>
+                        <div>
+                            <select class="one_person_add">
+                                <option value="">from</option>
+                            </select>
+                            ->
+                            <select class="one_person_add">
+                                <option value="">to</option>
+                            </select>
+                        </div>
+                        <div class="button_wrapper">
+                            <div class="elev_button" id="one_traffic">go</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="person_wrapper">
+                    <div>트래픽 n회 랜덤</div>
+                    <div>
+                        <input type="text" id="traffic_gen">
+                    </div>
+                    <div class="button_wrapper">
+                        <div class="elev_button" id="many_traffic">go</div>
+                    </div>
+                </div>
+            </div>
+            <div class="clock_tool_wrapper">
+                <span class="tool" id="pause">||</span>
+                <span class="tool" id="start">></span>
+                <span class="tool" id="faster">>></span>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <!-- 
+            엘레베이터 n대 
+            운행중 : n대, 대기중 : n대,
+            기다리는 사람 : n명
+        -->
+        <div id="overview">
+            <div id="overview_info">
+            엘리베이터: n대 (운행중: n대, 대기중: n대)<br>
+            기다리는 사람: n명
+            </div>
+            <div id="overview_clock">
+                <div id="clock">14:23:23</div>
+                <!--
+                    https://stackoverflow.com/questions/35322669/how-to-create-a-javascript-clock-with-custom-input-time
+                    faster : https://stackoverflow.com/questions/14272133/javascript-code-to-run-the-clock-date-and-time-four-times-faster
+                -->
+            </div>
+        </div>
+
+        <div id="panel"></div>
+    </div>
+    <script src="static/js/index.js"></script>
+    <script src="static/js/tools.js"></script>
+    <script src="static/lib/astiloader/astiloader.js"></script>
+    <script src="static/lib/astimodaler/astimodaler.js"></script>
+    <script src="static/lib/astinotifier/astinotifier.js"></script>
+    <script type="text/javascript">
+        index.init();
+    </script>
+</body>
+</html>

@@ -1,12 +1,33 @@
 package main
 
 import (
+	"flag"
+
+	astilectron "github.com/asticode/go-astilectron"
+	bootstrap "github.com/asticode/go-astilectron-bootstrap"
+	astilog "github.com/asticode/go-astilog"
+	"github.com/pkg/errors"
+	//"encoding/json"
+/*
 	docker "elevatorSim/dockerRun"
 	mng "elevatorSim/elevator"
-	"elevatorSim/timer"
 	"elevatorSim/traffic"
-	"fmt"
+*/
+	"elevatorSim/clock"
 	"time"
+
+)
+
+// Constants
+const htmlAbout = `Welcome on <b>Astilectron</b> demo!<br>
+This is using the bootstrap and the bundler.`
+
+// Vars
+var (
+	AppName string
+	BuiltAt string
+	debug   = flag.Bool("d", false, "enables the debug mode")
+	w       *astilectron.Window
 )
 
 const (
@@ -15,69 +36,56 @@ const (
 )
 
 func main() {
+	// Init
+	flag.Parse()
+	astilog.FlagInit()
 
-	/* Set Timer for this Program */
-	GlobalTimer := timer.NewTimer()
+	// Run bootstrap
+	astilog.Debugf("Running app built at %s", BuiltAt)
+	if err := bootstrap.Run(bootstrap.Options{
+		Asset:    Asset,
+		AssetDir: AssetDir,
+		AstilectronOptions: astilectron.Options{
+			AppName:            AppName,
+			AppIconDarwinPath:  "resources/icon/icon.icns",
+			AppIconDefaultPath: "resources/icon/icon.png",
+		},
+		Debug: *debug,
+		RestoreAssets: RestoreAssets,
+		OnWait: func(_ *astilectron.Astilectron, ws []*astilectron.Window, _ *astilectron.Menu, _ *astilectron.Tray, _ *astilectron.Menu) error {
+			// space for clock
+			c := clock.NewClock()
+			w = ws[0]
+			w.OpenDevTools()
 
-	/* Run Docker Container and Put Elevator image on Container */
-	dockerrun := docker.NewDockerRun()
-	dockerrun.EnsureImageExists()
-
-	elevMngr := mng.NewElevatorMngr(NR_ELEVATOR, GlobalTimer)
-	if err := elevMngr.AddElevators(); err != nil {
-		fmt.Printf("%v", err)
+			ticker := time.NewTicker(200 * time.Millisecond)
+			quit := make(chan struct{})
+			go func() {
+				for {
+				select {
+					case <- ticker.C:
+						clockString := c.GetClock().Format("01-02 15:04:05")
+						if err := bootstrap.SendMessage(w, "clock", clockString); err != nil {
+							astilog.Error(errors.Wrap(err, "send clock failed"))
+						}
+					case <- quit:
+						ticker.Stop()
+						return
+					}
+				}
+			}()
+			return nil
+		},
+		Windows: []*bootstrap.Window{{
+			Homepage:       "index.html",
+			MessageHandler: handleMessages,
+			Options: &astilectron.WindowOptions{
+				Center:          astilectron.PtrBool(true),
+				Height:          astilectron.PtrInt(700),
+				Width:           astilectron.PtrInt(900),
+			},
+		}},
+	}); err != nil {
+		astilog.Fatal(errors.Wrap(err, "running bootstrap failed"))
 	}
-	defer elevMngr.DeleteElevators()
-
-	/* Test Traffic Queue */
-	traffics := traffic.ElevatorTraffic()
-	for _, t := range traffics {
-		fmt.Println(t)
-	}
-
-	/* Run Test */
-	elapsedTime := time.Second * 0
-	var testDuration time.Duration = time.Second * TESTDURATION
-
-	for elapsedTime < testDuration {
-
-		curTime := GlobalTimer.GetTime()
-
-		if len(traffics) == 0 {
-			fmt.Println("No More Traffic")
-			break
-		}
-
-		traffic := traffics[0].Move.At
-		if curTime == traffic {
-			go elevMngr.MngElevator(*traffics[0])
-
-			traffics = traffics[1:]
-			elapsedTime = curTime.Sub(GlobalTimer.ProgramInitTime)
-		}
-	}
-
-	fmt.Println(elapsedTime)
-	/*
-		// docker attach 1stElevator
-		elevator1 := elevMngr.GetElevator("1stElevator")
-		go elevator1.ElevatorUp(10)
-
-		time.Sleep(time.Millisecond * 2500)
-		elevator2 := elevMngr.GetElevator("2ndElevator")
-		go elevator2.ElevatorUp(6)
-
-		time.Sleep(time.Second * 3)
-		status, _ := elevator1.GetElevatorStatus()
-		fmt.Println(status)
-		status, _ = elevator2.GetElevatorStatus()
-		fmt.Println(status)
-
-		time.Sleep(time.Second * 3)
-		status, _ = elevator1.GetElevatorStatus()
-		fmt.Println(status)
-		status, _ = elevator2.GetElevatorStatus()
-		fmt.Println(status)
-	*/
-	time.Sleep(time.Second * 10)
 }
